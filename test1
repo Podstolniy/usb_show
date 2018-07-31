@@ -1,0 +1,24 @@
+# -*- coding: utf-8 -*-
+#my_unicode_string = u"This's Unicode!"
+#!/usr/bin/python
+
+import os
+import platform
+import csv
+import subprocess
+import sys
+import argparse
+import json
+import math
+import abc
+from collections import Counter
+	
+def main():
+	proc = subprocess.Popen('wmic path win32_usbhub Where (Caption="Запоминающее устройство для USB") get DeviceID', stdout=subprocess.PIPE, shell=True)
+	(out, err) = proc.communicate()
+	proc.kill()
+	split_out=out.decode('utf-8').replace('\\',' ').replace('&',' ').replace('_','=')
+	return split_out
+
+if __name__ == '__main__':
+	main()
