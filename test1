@@ -14,10 +14,13 @@ import abc
 from collections import Counter
 	
 def main():
-	proc = subprocess.Popen('wmic path win32_usbhub Where (Caption="Запоминающее устройство для USB") get DeviceID', stdout=subprocess.PIPE, shell=True)
+	print(pars_repl())
+
+def pars_repl():
+	proc = subprocess.Popen('wmic path win32_usbhub Where (Caption="Запоминающее устройство для USB") get DeviceID', stdout=subprocess.PIPE, shell=False)
 	(out, err) = proc.communicate()
-	proc.kill()
-	split_out=out.decode('utf-8').replace('\\',' ').replace('&',' ').replace('_','=')
+	split_out=out.decode('utf-8').replace('\\',' ').replace('&',' ').replace('_','=')	
+	proc.kill()	
 	return split_out
 
 if __name__ == '__main__':
