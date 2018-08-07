@@ -13,15 +13,25 @@ import math
 import abc
 from collections import Counter
 	
-def main():
-	print(pars_repl())
+def pars_str():
+	str = pars_repl()
+	if len(str)!=0:
+		str.pop(0)
+	l=[]
+	a=0
+	while a<len(str):
+		l.append(str[a].replace('\\',' ').replace('&',' ').replace('_','='))
+		a=a+1
+	return '\n'.join(l)
 
 def pars_repl():
 	proc = subprocess.Popen('wmic path win32_usbhub Where (Caption="Запоминающее устройство для USB") get DeviceID', stdout=subprocess.PIPE, shell=False)
 	(out, err) = proc.communicate()
-	split_out=out.decode('utf-8').replace('\\',' ').replace('&',' ').replace('_','=')	
-	proc.kill()	
+	split_out=out.decode('utf-8').split()
 	return split_out
+
+def main():
+	print(pars_str())	
 
 if __name__ == '__main__':
 	main()
