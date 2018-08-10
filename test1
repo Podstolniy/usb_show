@@ -13,31 +13,43 @@ import math
 import abc
 from collections import Counter
 
+def pars_usbmodel():		#	функция разбора строк из modelUSB()
+	usb = modelUSB()
+	cleanusb=[cleanusb.replace('\\',' ').replace('&',' ').replace('VEN_','').\
+	replace('PROD_','').replace('REV_','').split(' ') for cleanusb in usb] #чистим строку в цикле
+	indusb=[p[3] for p in cleanusb]		#	берем название USB из строки по индексу [3] 
+	return indusb
 def pars_str():	#	функция разбора строк из pars_repl()
 	str = pars_repl()
-	if len(str)!=0:
+	usb=pars_usbmodel()
+	if len(str)!=0:#проверяем на пустой список
 		str.pop(0)
-	l=[]	#разбираем строку по разделителю
+	cleanstr=[cleanstr.replace('\\',' ').replace('&',' ').replace('VID_','').\
+	replace('PID_','').split(' ') for cleanstr in str]	#чистим строку в цикле
+	
+	rec=[]	#делаем удобочитаемую маску вывода 'Имя','VID=','PID=','S/N='
 	a=0
-	while a<len(str):
-		l.append(str[a].replace('\\',' ').replace('&',' ').replace('VID_','').replace('PID_','').split(' '))
-		a=a+1
-	rec=[]	#делаем удобочитаемую маску вывода 'VID=','PID=','S/N='
-	a=0
-	for p in l:
-		rec.append([p[0],'VID='+p[1],'PID='+p[2],'S/N='+p[3]])
+	for p in cleanstr:
+		rec.append([usb[a],'VID='+p[1],'PID='+p[2],'S/N='+p[3]]) #ТУТ ПРАВКА!!!!!!!
 		a=a+1
 	return rec
 
-def pars_repl(): #	функция парсинг даннх из wmic
-	proc = subprocess.Popen('wmic path win32_usbhub Where (Caption="Запоминающее устройство для USB") get DeviceID', stdout=subprocess.PIPE, shell=False)
+def pars_repl(): #	функция парсинг даннх из wmic для определения VID и PID
+	proc = subprocess.Popen('wmic path win32_usbhub Where (Caption="Запоминающее устройство для USB") get DeviceID',\
+	stdout=subprocess.PIPE, shell=True)
 	(out, err) = proc.communicate()
 	split_out=out.decode('utf-8').split()
-	return split_out	
+	return split_out
+
+def modelUSB():
+	proc = subprocess.Popen('wmic path Win32_PnPEntity get DeviceID | find "USBSTOR\D"', stdout=subprocess.PIPE, shell=True)	
+	(out, err) = proc.communicate()
+	modusb=out.decode('utf-8').split()
+	return modusb
 
 def main():
-	str=pars_str()
-	[print(p) for p in str]	
+	pri=pars_str()
+	[print(p) for p in pri]
 	
 if __name__ == '__main__':
 	main()
